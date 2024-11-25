@@ -1,4 +1,4 @@
-const Product = require("../models/product.js");
+const Product = require("../models/Product.js");
 
 // Добавить товар
 exports.addProduct = async (req, res) => {
@@ -11,10 +11,34 @@ exports.addProduct = async (req, res) => {
   }
 };
 
+// search by name products
+exports.searchProductsByName = async (req, res) => {
+  try {
+    const products = await Product.find({
+      name: { $regex: req.query.name, $options: "i" },
+    }).popuplate("category");
+    return res.json({ data: products });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
+// search by barcode products
+exports.searchProductsByBarcode = async (req, res) => {
+  try {
+    const products = await Product.find({
+      barCode: { $regex: req.query.barCode, $options: "i" },
+    }).popuplate("category");
+    return res.json({ data: products });
+  } catch (error) {
+    return res.status(500).json({ error: error.message });
+  }
+};
+
 // Получить все товары
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find();
+    const products = await Product.find().popuplate("category");
     return res.json({ data: products });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -24,7 +48,7 @@ exports.getProducts = async (req, res) => {
 // Получить товар по id
 exports.getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
+    const product = await Product.findById(req.params.id).popuplate("category");
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }

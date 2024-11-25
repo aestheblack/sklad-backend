@@ -1,4 +1,4 @@
-const { Schema, model } = require("mongoose");
+const { Schema, Types, model } = require("mongoose");
 const productSchema = new Schema(
   {
     name: {
@@ -7,20 +7,30 @@ const productSchema = new Schema(
     },
     description: {
       type: String,
-      required: false,
-      default: "No description provided",
+      required: true,
+    },
+    category: {
+      type: Types.ObjectId,
+      ref: "categories",
+      required: true,
+    },
+    barCode: {
+      type: String,
+      required: true,
     },
     quantity: {
-      type: Number,
       default: 0,
+      type: Number,
+      required: true,
     },
     price: {
+      default: 0,
       type: Number,
       required: true,
     },
     createdAt: {
       type: Date,
-      default: Date.now,
+      default: Date.now(),
     },
   },
   {
@@ -28,4 +38,5 @@ const productSchema = new Schema(
   }
 );
 
-module.exports = model("Product", productSchema);
+const Product = model("products", productSchema);
+module.exports = Product;
