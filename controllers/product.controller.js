@@ -3,7 +3,18 @@ const Product = require("../models/Product.js");
 // Добавить товар
 exports.addProduct = async (req, res) => {
   try {
-    const newProduct = new Product(req.body);
+    if ((!req.admin || !req.admin.id) && (!req.helper || !req.helper.id)) {
+      return res.status(401).json({
+        error: "Unauthorized: admin or helper credentials are missing.",
+      });
+    }
+    const helperId = req.helper ? req.helper.id : null;
+    const adminId = req.admin ? req.admin.id : null;
+    const newProduct = new Product({
+      ...req.body,
+      adminId,
+      helperId,
+    });
     await newProduct.save();
     return res.status(201).json({ data: newProduct });
   } catch (error) {
@@ -16,7 +27,7 @@ exports.searchProductsByName = async (req, res) => {
   try {
     const products = await Product.find({
       name: { $regex: req.query.name, $options: "i" },
-    }).popuplate("category");
+    }).popuplate(["category", "customer", "adminId", "helperId"]);
     return res.json({ data: products });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -28,7 +39,7 @@ exports.searchProductsByBarcode = async (req, res) => {
   try {
     const products = await Product.find({
       barCode: { $regex: req.query.barCode, $options: "i" },
-    }).popuplate("category");
+    }).popuplate(["category", "customer", "adminId", "helperId"]);
     return res.json({ data: products });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -38,7 +49,12 @@ exports.searchProductsByBarcode = async (req, res) => {
 // Получить все товары
 exports.getProducts = async (req, res) => {
   try {
-    const products = await Product.find().popuplate("category");
+    const products = await Product.find().popuplate([
+      "category",
+      "customer",
+      "adminId",
+      "helperId",
+    ]);
     return res.json({ data: products });
   } catch (error) {
     return res.status(500).json({ error: error.message });
@@ -48,7 +64,12 @@ exports.getProducts = async (req, res) => {
 // Получить товар по id
 exports.getProductById = async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id).popuplate("category");
+    const product = await Product.findById(req.params.id).popuplate([
+      "category",
+      "customer",
+      "adminId",
+      "helperId",
+    ]);
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }

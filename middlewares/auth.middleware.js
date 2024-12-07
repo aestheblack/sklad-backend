@@ -24,6 +24,10 @@ exports.authenticate = (req, res, next) => {
         req.helper = decoded;
         req.userId = decoded.id;
         break;
+      case "guest":
+        req.guest = decoded;
+        req.userId = decoded.id;
+        break;
       default:
         return res.status(403).json({
           status: "error",

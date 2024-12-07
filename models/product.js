@@ -7,12 +7,6 @@ const productSchema = new Schema(
     },
     description: {
       type: String,
-      required: true,
-    },
-    category: {
-      type: Types.ObjectId,
-      ref: "categories",
-      required: true,
     },
     barCode: {
       type: String,
@@ -21,12 +15,28 @@ const productSchema = new Schema(
     quantity: {
       default: 0,
       type: Number,
-      required: true,
     },
     price: {
       default: 0,
       type: Number,
+    },
+    category: {
+      type: Types.ObjectId,
+      ref: "categories",
       required: true,
+    },
+    customer: {
+      type: Types.ObjectId,
+      ref: "customers",
+      required: true,
+    },
+    adminId: {
+      type: Types.ObjectId,
+      ref: "admins",
+    },
+    helperId: {
+      type: Types.ObjectId,
+      ref: "helpers",
     },
     createdAt: {
       type: Date,
